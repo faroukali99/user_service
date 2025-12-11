@@ -13,6 +13,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe représentant un utilisateur dans le système.
+ * Cette entité est mappée à la table "users" dans la base de données.
+ * Elle contient les informations de base d'un utilisateur ainsi que des méthodes utilitaires
+ * pour la gestion des rôles, de la vérification d'email et de la sécurité du compte.
+ */
 @Entity
 @Table(name = "users")
 public class User {
