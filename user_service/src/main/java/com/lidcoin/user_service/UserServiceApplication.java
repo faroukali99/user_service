@@ -11,6 +11,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * et permet l'utilisation de clients Feign pour la communication inter-services.
  */
 @SpringBootApplication
+@EnableFeignClients
 public class UserServiceApplication {
 
 	public static void main(String[] args) {

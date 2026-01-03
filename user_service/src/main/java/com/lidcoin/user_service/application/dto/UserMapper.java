@@ -1,4 +1,4 @@
-package com.lidcoin.user_service.application.dtos;
+package com.lidcoin.user_service.application.dto;
 
 import com.lidcoin.user_service.domain.model.User;
 import org.springframework.stereotype.Component;

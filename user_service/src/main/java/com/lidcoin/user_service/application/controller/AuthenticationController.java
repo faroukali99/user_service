@@ -1,7 +1,7 @@
 package com.lidcoin.user_service.application.controller;
 
-import com.lidcoin.user_service.application.dtos.LoginRequest;
-import com.lidcoin.user_service.application.dtos.PasswordResetRequest;
+import com.lidcoin.user_service.application.dto.LoginRequest;
+import com.lidcoin.user_service.application.dto.PasswordResetRequest;
 import com.lidcoin.user_service.application.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

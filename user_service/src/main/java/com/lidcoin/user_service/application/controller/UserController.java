@@ -1,7 +1,7 @@
 package com.lidcoin.user_service.application.controller;
 
 import com.lidcoin.user_service.application.dto.UserDTO;
-import com.lidcoin.user_service.application.dtos.UserRegistrationRequest;
+import com.lidcoin.user_service.application.dto.UserRegistrationRequest;
 import com.lidcoin.user_service.application.services.UserService;
 import com.lidcoin.user_service.domain.enums.UserRole;
 import com.lidcoin.user_service.domain.enums.UserStatus;

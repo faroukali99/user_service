@@ -76,4 +76,4 @@ mvn test
 
 ## Licence
 
-[À spécifier]
+LidCoin

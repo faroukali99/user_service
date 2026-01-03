@@ -1,8 +1,9 @@
 package com.lidcoin.user_service.application.services;
 
-import com.lidcoin.user_service.application.dtos.LoginRequest;
+import com.lidcoin.user_service.application.dto.LoginRequest;
 import com.lidcoin.user_service.domain.model.User;
 import com.lidcoin.user_service.infrastructure.repository.UserRepository;
+import com.lidcoin.user_service.infrastructure.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Service de gestion de l'authentification des utilisateurs.
- * Fournit des méthodes pour la connexion, la déconnexion, la vérification d'email,
- * la réinitialisation de mot de passe et la gestion des jetons d'authentification.
- * Gère également la sécurité des mots de passe et la validation des informations d'identification.
- */
 @Service
 @Transactional
 public class AuthenticationService {
@@ -27,15 +22,18 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
     public AuthenticationService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            UserService userService) {
+            UserService userService,
+            JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     public Map<String, Object> authenticate(LoginRequest loginRequest) {
@@ -79,12 +77,12 @@ public class AuthenticationService {
         // Enregistrer la connexion réussie
         userService.recordLoginAttempt(user.getUsername(), true);
 
-        // Générer un token simple (remplacer par JWT plus tard)
-        String simpleToken = UUID.randomUUID().toString();
-
+        // Générer un token JWT
         String roles = user.getRoles().stream()
                 .map(Enum::name)
                 .collect(Collectors.joining(","));
+
+        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getId(), roles);
 
         return Map.of(
                 "success", true,
@@ -92,7 +90,8 @@ public class AuthenticationService {
                 "username", user.getUsername(),
                 "email", user.getEmail(),
                 "roles", roles,
-                "token", simpleToken,
+                "token", jwtToken,
+                "tokenType", "Bearer",
                 "message", "Authentification réussie"
         );
     }
@@ -150,11 +149,53 @@ public class AuthenticationService {
     }
 
     public Map<String, Object> validateToken(String token) {
-        // Validation simple (à remplacer par JWT)
-        return Map.of(
-                "valid", true,
-                "token", token,
-                "message", "Token valide (validation simple)"
-        );
+        try {
+            if (jwtUtil.validateToken(token)) {
+                String username = jwtUtil.extractUsername(token);
+                Long userId = jwtUtil.extractUserId(token);
+                String roles = jwtUtil.extractRoles(token);
+
+                return Map.of(
+                        "valid", true,
+                        "username", username,
+                        "userId", userId,
+                        "roles", roles,
+                        "message", "Token valide"
+                );
+            } else {
+                return Map.of(
+                        "valid", false,
+                        "message", "Token invalide ou expiré"
+                );
+            }
+        } catch (Exception e) {
+            return Map.of(
+                    "valid", false,
+                    "message", "Erreur lors de la validation du token: " + e.getMessage()
+            );
+        }
+    }
+
+    public Map<String, Object> refreshToken(String oldToken) {
+        try {
+            if (jwtUtil.validateToken(oldToken)) {
+                String username = jwtUtil.extractUsername(oldToken);
+                Long userId = jwtUtil.extractUserId(oldToken);
+                String roles = jwtUtil.extractRoles(oldToken);
+
+                String newToken = jwtUtil.generateToken(username, userId, roles);
+
+                return Map.of(
+                        "success", true,
+                        "token", newToken,
+                        "tokenType", "Bearer",
+                        "message", "Token rafraîchi avec succès"
+                );
+            } else {
+                throw new RuntimeException("Token invalide ou expiré");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors du rafraîchissement du token: " + e.getMessage());
+        }
     }
 }
