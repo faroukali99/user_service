@@ -79,8 +79,8 @@ public class DataLoader implements CommandLineRunner {
         // Créer un utilisateur test
         User testUser = new User();
         testUser.setUsername("testuser");
-        testUser.setEmail("test@lidcoin.com");
-        testUser.setPasswordHash(passwordEncoder.encode("Test@123"));
+        testUser.setEmail("faroukoualiou2005@gmail.com");
+        testUser.setPasswordHash(passwordEncoder.encode("far10ouk10"));
         testUser.setFirstName("Test");
         testUser.setLastName("User");
         testUser.setPhoneNumber("+22890000002");
